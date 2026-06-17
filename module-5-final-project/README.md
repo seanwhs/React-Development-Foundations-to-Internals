@@ -1,4 +1,4 @@
-# Capstone Project — Synthesis Application
+# Capstone Project — Synthesis Application (Production React System Design)
 
 > Module 5 — React Development: Foundations to Internals
 
@@ -6,165 +6,230 @@
 
 # Overview
 
-This is the **capstone project** of the curriculum.
+This capstone is a **systems-level React engineering exercise**.
 
-You are expected to design and build a **production-grade React application** that synthesizes everything learned across all modules:
+You are not building a “project.”
 
-* JSX & Components (Module 1)
-* State & Hooks (Module 2)
-* Fiber & Reconciliation mental model (Module 3)
-* Performance & Concurrent React thinking (Module 4)
+You are designing a **production-grade frontend system** that demonstrates your ability to:
 
-This is not a tutorial project.
+* model state correctly
+* structure scalable UI architecture
+* reason about rendering behavior
+* manage performance under real-world constraints
+* apply React internals (Fiber, scheduling, reconciliation) indirectly through design decisions
 
-It is an **engineering assessment of React mastery**.
-
----
-
-# Objective
-
-Build a **fully functional React application** that demonstrates:
-
-* Strong component architecture
-* Correct state modeling
-* Clean data flow
-* Realistic side-effect handling
-* Performance-aware design
-* Scalable folder and module structure
-
-The domain is flexible, but the architecture must be rigorous.
+This is an **engineering judgment assessment**, not a feature implementation tutorial.
 
 ---
 
-# Suggested Project Types
+# Core Objective
 
-Choose ONE:
+Design and implement a React application that demonstrates:
 
-* Task Management System (Notion / Trello style)
-* Analytics Dashboard (data-heavy UI)
-* E-commerce Admin Panel
-* Real-time Chat Application
-* Personal Finance Tracker
-* Learning Management System (LMS)
+> A scalable, maintainable, and performance-aware UI system built on sound React architecture principles.
 
-You may extend or customize the domain, but complexity must be equivalent.
+Your system should reflect an understanding that:
 
----
-
-# Core Requirements
-
-## 1. Component Architecture
-
-Your application must be decomposed into clear layers:
-
-```text id="c1a8p0"
-App
-├── Layout
-├── Pages
-│   ├── Dashboard
-│   ├── Detail View
-│   ├── Settings
-│   └── Profile
-├── Features
-└── Shared UI Components
+```text
+UI = f(State)
 ```
 
-Each component should have a clear responsibility and boundary.
+and that every state update flows through:
 
----
-
-## 2. State Design
-
-You must explicitly define and justify:
-
-* Local state
-* Shared state
-* Derived state
-* Server state (if applicable)
-
-State placement must be intentional, not accidental.
-
----
-
-## 3. Data Flow
-
-All data must follow a predictable flow:
-
-```text id="d2k9q1"
-API → State → Components → UI
+```text
+Scheduler → Fiber Render → Reconciliation → Commit → UI
 ```
 
-Requirements:
+---
 
-* Unidirectional data flow
-* Minimal prop drilling (use composition or context where appropriate)
-* Clear separation between data and presentation
+# Suggested System Domains
+
+Choose one domain and treat it as a **real product system**, not a demo:
+
+* Task Management Platform (Notion/Trello-scale thinking)
+* Analytics / Observability Dashboard (high render complexity)
+* E-commerce Admin + Inventory System
+* Real-time Collaboration Tool (chat or workspace)
+* Personal Finance / Banking Dashboard
+* Learning Management System (LMS with content + tracking)
+
+You may extend the domain, but complexity must remain **system-realistic**.
 
 ---
 
-## 4. Hooks Usage
+# System Design Requirements
 
-You must correctly use:
+## 1. Architecture as a First-Class Concern
+
+You must design your system as a set of **bounded UI domains**:
+
+```text
+Application Shell
+├── Routing Layer
+├── Layout System
+├── Domain Modules
+│   ├── Feature A
+│   ├── Feature B
+│   ├── Feature C
+├── Shared UI System
+└── Infrastructure Layer (API, caching, utilities)
+```
+
+### Expectations:
+
+* Each domain should be independently understandable
+* Cross-domain dependencies must be explicit and minimal
+* Components should reflect **responsibility boundaries**, not file grouping
+
+---
+
+## 2. State Architecture (Critical)
+
+You must explicitly define:
+
+* **Local state** (UI-level state)
+* **Derived state** (computed from other state)
+* **Shared state** (cross-component)
+* **Server state** (external synchronization)
+
+### Required justification:
+
+For every state decision:
+
+> Why does this state live here?
+
+You should be able to defend state placement in terms of:
+
+* render behavior
+* update frequency
+* dependency coupling
+* reconciliation cost
+
+---
+
+## 3. Data Flow Model
+
+Your system must enforce:
+
+```text
+Source of Truth → State Layer → Component Tree → UI
+```
+
+### Constraints:
+
+* No circular state dependencies
+* No hidden mutation flows
+* Avoid uncontrolled prop drilling
+* Prefer composition or scoped context
+
+You are designing a **predictable render pipeline**, not just UI components.
+
+---
+
+## 4. Hooks & React Execution Discipline
+
+You must demonstrate correct understanding of React execution:
+
+Required Hooks:
 
 * `useState`
 * `useEffect`
 * `useRef`
 * `useMemo`
 * `useCallback`
-* Custom hooks
+* Custom Hooks
 
-Rules:
+### Required discipline rules:
 
-* No unnecessary memoization
-* Effects must have explicit dependency logic
-* Side effects must be isolated and predictable
+* Effects must represent **external synchronization only**
+* Memoization must be **intentional, not default**
+* Derived values should be classified explicitly:
 
----
-
-## 5. Side Effects Management
-
-Your system must correctly handle:
-
-* API requests
-* Subscriptions / event listeners
-* Cleanup logic
-* Async workflows
-
-No side effects should leak into rendering logic.
+  * compute in render vs memoized vs externalized
+* No hidden side effects in render logic
 
 ---
 
-## 6. Performance Considerations
+## 5. Side Effect Architecture
 
-You are expected to reason about:
+All side effects must be isolated into controlled boundaries:
 
-* Component re-renders
-* Prop stability
-* List rendering efficiency
-* Expensive computations
-* Rendering boundaries
+* API layer (`services/`)
+* custom hooks (`hooks/`)
+* effect handlers (`useEffect` usage discipline)
 
-You are NOT required to over-optimize, but you MUST demonstrate awareness.
+### Required behaviors:
+
+* Proper cleanup (subscriptions, listeners, timers)
+* Cancellation handling for async flows
+* No uncontrolled side effects in components
+
+You are modeling:
+
+> React render phase must remain pure
 
 ---
 
-## 7. File Structure
+## 6. Performance Model (React Internals Awareness)
 
-Recommended structure:
+You are not required to micro-optimize.
 
-```text id="s9v3k2"
+You ARE required to demonstrate reasoning about:
+
+* render frequency
+* reconciliation cost
+* subtree invalidation
+* prop stability
+* list rendering behavior
+* unnecessary work triggered by state updates
+
+### Expected mindset:
+
+You should be able to answer:
+
+> “What does this state change trigger in the Fiber tree?”
+
+---
+
+## 7. Rendering Boundaries (Advanced Requirement)
+
+You must intentionally design at least one:
+
+* UI boundary (layout isolation)
+* state boundary (context or scoped store)
+* rendering boundary (lazy-loaded or deferred UI)
+* async boundary (loading/error separation)
+
+This demonstrates understanding of:
+
+```text
+Render → Reconcile → Commit → UI
+```
+
+and how to control work propagation.
+
+---
+
+## 8. File Structure (Guided, Not Strict)
+
+Your structure should reflect **domain boundaries**, not just file types:
+
+```text
 src/
 
-├── components/        # Reusable UI primitives
-├── features/          # Feature-based modules
-├── pages/             # Route-level components
-├── hooks/             # Custom hooks
-├── services/          # API layer
-├── state/             # Global/shared state (if needed)
-├── utils/             # Pure utilities
-├── styles/            # Styling system
-└── App.jsx
+├── app/               # Application bootstrap & routing
+├── domains/          # Feature domains (core system units)
+├── components/       # Shared UI primitives
+├── hooks/            # Custom React hooks
+├── services/         # API / external systems
+├── state/            # Shared state coordination
+├── utils/            # Pure functions
+└── styles/
 ```
+
+### Key Principle:
+
+> Structure should reflect execution boundaries, not organization convenience.
 
 ---
 
@@ -172,104 +237,109 @@ src/
 
 ## Required Principles
 
-Your implementation must follow:
+Your system must demonstrate:
 
-* Composition over inheritance
-* Separation of concerns
-* Predictable state updates
-* Locality of reasoning
-* Minimal coupling between modules
+* composition over inheritance
+* separation of concerns
+* predictable render behavior
+* explicit state ownership
+* minimal cross-module coupling
 
 ---
 
 ## Forbidden Patterns
 
-Avoid:
-
-* Overuse of global state without justification
-* Mixing UI logic and side effects
-* Large monolithic components
-* Uncontrolled prop drilling
-* Unnecessary memoization “by default”
+* global state without architectural justification
+* mixing rendering logic with side effects
+* monolithic components (>200 lines without clear separation)
+* uncontrolled prop drilling (without reasoning)
+* memoization without measurable or structural reason
 
 ---
 
 # React Architecture Alignment
 
-Your design should implicitly align with React’s internal model:
+Your system should implicitly respect React’s internal pipeline:
 
-```text id="r8v2m1"
+```text
 State Update
-    ↓
-Scheduler
-    ↓
-Fiber Render Phase
-    ↓
-Reconciliation
-    ↓
-Commit Phase
-    ↓
+   ↓
+Scheduler (priority assignment)
+   ↓
+Fiber Render (component execution)
+   ↓
+Reconciliation (tree diffing)
+   ↓
+Commit Phase (DOM mutation)
+   ↓
 UI Update
 ```
 
-You are not implementing Fiber — but your architecture should respect its behavior.
+You are not implementing this pipeline — but your architecture should behave *as if it exists underneath every decision*.
 
 ---
 
 # Evaluation Criteria
 
-Your project will be evaluated on:
+## 1. System Design Quality
 
-## 1. Architecture Quality
+* clarity of boundaries
+* scalability of architecture
+* separation of domains
 
-* Clear separation of concerns
-* Scalable structure
-* Logical module boundaries
+## 2. State Modeling
 
-## 2. State Design
+* correctness of placement
+* minimal redundancy
+* predictable updates
 
-* Correct placement
-* Minimal redundancy
-* Predictable updates
+## 3. React Correctness
 
-## 3. Code Clarity
+* proper hook usage
+* correct effect isolation
+* no render-phase side effects
 
-* Readability
-* Maintainability
-* Component design
+## 4. Performance Awareness
 
-## 4. React Correctness
+* understanding of render triggers
+* avoidance of unnecessary work
+* awareness of reconciliation impact
 
-* Proper Hook usage
-* Correct effect management
-* No anti-patterns
+## 5. Engineering Judgment
 
-## 5. Performance Awareness
-
-* Reasonable rendering behavior
-* Awareness of re-renders
-* Efficient UI updates
+* ability to justify trade-offs
+* awareness of alternatives
+* clarity of reasoning in README
 
 ---
 
 # Deliverables
 
-You must submit:
+You must provide:
 
 * Full source code
-* README explaining architecture decisions
-* State model explanation
-* Component breakdown diagram (optional but recommended)
+* Architecture README (mandatory)
+* State model explanation (mandatory)
+* Component/domain breakdown
+* (Optional) diagram of system flow
 
 ---
 
 # Final Note
 
-This project is not about demonstrating React knowledge.
+This capstone is not testing whether you can build a React app.
 
-It is about demonstrating **engineering judgment using React**.
+It is testing whether you can:
 
-You are expected to make trade-offs, justify decisions, and structure a system that could scale beyond a toy application.
+> design a system that behaves correctly under React’s execution model
+
+You are being evaluated on:
+
+* structural thinking
+* rendering awareness
+* system decomposition
+* performance reasoning
+* architectural judgment
 
 ---
 
@@ -277,11 +347,14 @@ You are expected to make trade-offs, justify decisions, and structure a system t
 
 By completing this capstone, you should be able to:
 
-* Design React systems from scratch
-* Reason about rendering and performance
-* Structure scalable frontend architectures
-* Apply React internals knowledge indirectly in real code
+* design React systems from scratch
+* reason about rendering behavior at scale
+* structure production-grade frontend architectures
+* make informed performance trade-offs
+* think in terms of Fiber execution (implicitly)
 
 ---
 
 # End of Capstone Specification
+
+Just tell me.
