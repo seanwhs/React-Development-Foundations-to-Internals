@@ -41,7 +41,7 @@ Navigate to `module-1-foundations/` to get started with the first set of exercis
 ## 📂 Repository Structure
 
 ```text
-react-internals-mastery/
+React-Development-Foundations-to-Internals/
 ├── module-1-foundations/   # JSX, Components, State, Props
 ├── module-2-state/         # Hooks & Lifecycle
 ├── module-3-internals/     # Fiber & Reconciliation
