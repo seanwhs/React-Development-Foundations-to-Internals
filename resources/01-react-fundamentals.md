@@ -1,6 +1,5 @@
 # 📄 `resources/01-react-fundamentals.md`
 
-````md
 # React Fundamentals — Mental Model Reference
 
 This document summarizes the core mental model of React as a UI system.
@@ -73,4 +72,3 @@ It recomputes a UI description and applies only the minimal necessary changes.
 
 
 👉 `resources/02-jsx-and-elements.md`
-```
